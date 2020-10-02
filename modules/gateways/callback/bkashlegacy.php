@@ -310,6 +310,7 @@ class bKashLegacy
     {
         try {
             $fields = $this->credential;
+            
             if ($this->verifyType === 'refmsg') {
                 $fields['reference'] = $this->invoice['invoiceid'];
             } else {
@@ -409,13 +410,6 @@ if (!$bKashLegacy->isActive) {
     die("The gateway is unavailable.");
 }
 
-$response = [
-    'status'  => 'error',
-    'message' => 'Invalid action.',
-];
-
-$response = $bKashLegacy->makeTransaction();
-
 header('Content-Type: application/json');
 
-echo json_encode($response);
+echo json_encode($bKashLegacy->makeTransaction());
