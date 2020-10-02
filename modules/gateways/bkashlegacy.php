@@ -109,7 +109,7 @@ HTML;
     <li>Enter <span class="label label-primary">4</span> for <span class="label label-primary">Payment</span></li>
     <li>Enter Number: <span class="label label-primary">{$params['msisdn']}</span></li></li>
     <li>Enter Due Amount <span class="label label-primary">{$totalDue}</span> Taka</li>
-    <li>Enter Invoice <span class="label label-primary">{$params['invoiceid']}</span> as Reference</li>
+    <li>Enter Invoice #<span class="label label-primary">{$params['invoiceid']}</span> as Reference</li>
     <li>Enter <span class="label label-primary">{$params['counter']}</span> as Counter Number</li>
     <li>Enter PIN and Confirm</li>
 </ol>

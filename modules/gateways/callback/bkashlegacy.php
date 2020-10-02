@@ -93,7 +93,7 @@ class bKashLegacy
     private $credential;
 
     /**
-     * bKashCheckout constructor.
+     * bKashLegacy constructor.
      */
     function __construct()
     {
@@ -403,9 +403,9 @@ if (!$_SERVER['REQUEST_METHOD'] === 'POST') {
     die("Direct access forbidden.");
 }
 
-$bKashCheckout = bKashLegacy::init();
+$bKashLegacy = bKashLegacy::init();
 
-if (!$bKashCheckout->isActive) {
+if (!$bKashLegacy->isActive) {
     die("The gateway is unavailable.");
 }
 
@@ -414,7 +414,7 @@ $response = [
     'message' => 'Invalid action.',
 ];
 
-$response = $bKashCheckout->makeTransaction();
+$response = $bKashLegacy->makeTransaction();
 
 header('Content-Type: application/json');
 
