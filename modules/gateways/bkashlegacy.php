@@ -148,9 +148,12 @@ function bkashlegacy_scriptsHandle($params)
                     window.location = "{$params['returnurl']}" + "&paymentsuccess=true";
                 } else {
                    bKashResponse.removeClass('hidden');
-                   bKashResponse.text(response.message)   
+                   bKashResponse.text(response.message);   
                 }
-            }).always(function () {
+            }).fail(function() {
+                bKashResponse.removeClass('hidden');
+                bKashResponse.text('Something is wrong! Please contact support.');
+              }).always(function () {
                 bkashBtn.removeAttr('disabled');
                 bKashLoader.addClass('hidden');
             });
