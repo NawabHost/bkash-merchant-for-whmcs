@@ -1,8 +1,6 @@
 <?php
 
 use Carbon\Carbon;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
 use Symfony\Component\HttpFoundation\Request;
 use WHMCS\Database\Capsule;
 
@@ -36,6 +34,11 @@ class bKashLegacy
      * @var boolean
      */
     public $isActive;
+
+    /**
+     * @var string
+     */
+    protected $baseUrl;
 
     /**
      * @var integer
@@ -78,11 +81,6 @@ class bKashLegacy
     public $total;
 
     /**
-     * @var \GuzzleHttp\Client
-     */
-    protected $httpClient;
-
-    /**
      * @var \Symfony\Component\HttpFoundation\Request
      */
     public $request;
@@ -93,14 +91,15 @@ class bKashLegacy
     private $credential;
 
     /**
-     * bKashLegacy constructor.
+     * bKashCheckout constructor.
      */
     function __construct()
     {
         $this->setGateway();
-        $this->setHttpClient();
         $this->setRequest();
         $this->setInvoice();
+
+        $this->baseUrl = 'https://www.bkashcluster.com:9081/dreamwave/merchant/trxcheck/';
     }
 
     /**
@@ -135,29 +134,11 @@ class bKashLegacy
     }
 
     /**
-     * Get and set request
+     * Set request
      */
     private function setRequest()
     {
         $this->request = Request::createFromGlobals();
-    }
-
-    /**
-     * Set guzzle as HTTP client.
-     */
-    private function setHttpClient()
-    {
-        $this->httpClient = new Client(
-            [
-                'base_uri'    => 'https://www.bkashcluster.com:9081/dreamwave/merchant/trxcheck/',
-                'http_errors' => false,
-                'timeout'     => 30,
-                'headers'     => [
-                    'Content-Type' => 'application/json',
-                    'Accept'       => 'application/json',
-                ],
-            ]
-        );
     }
 
     /**
@@ -176,7 +157,7 @@ class bKashLegacy
     }
 
     /**
-     * Set currency
+     * Set currency.
      */
     private function setCurrency()
     {
@@ -203,7 +184,7 @@ class bKashLegacy
     }
 
     /**
-     * Set Fee.
+     * Set fee.
      */
     private function setFee()
     {
@@ -211,7 +192,7 @@ class bKashLegacy
     }
 
     /**
-     * Set Total.
+     * Set total.
      */
     private function setTotal()
     {
@@ -219,7 +200,7 @@ class bKashLegacy
     }
 
     /**
-     * Check if transaction if exists.
+     * Check if transaction is exists.
      *
      * @param string $trxId
      *
@@ -298,7 +279,7 @@ class bKashLegacy
             '4001' => 'Duplicate request done with same information (e.g. same transaction id).',
         ];
 
-        return isset($errors[$code]) ? $errors[$code] : 'Invalid error code';
+        return isset($errors[$code]) ? $errors[$code] : 'Unknown error.';
     }
 
     /**
@@ -308,39 +289,39 @@ class bKashLegacy
      */
     public function verifyPayment()
     {
-        try {
-            $fields = $this->credential;
-            
-            if ($this->verifyType === 'refmsg') {
-                $fields['reference'] = $this->invoice['invoiceid'];
-            } else {
-                $fields['trxid'] = $this->request->get('trxId');
-            }
-
-            $response = $this->httpClient->post($this->verifyType, [
-                'json' => $fields,
-            ]);
-
-            $data = json_decode($response->getBody()->getContents(), true);
-
-            if (is_array($data)) {
-                if ($this->verifyType === 'refmsg') {
-                    return $data['transaction'][0];
-                } else {
-                    return $data['transaction'];
-                }
-            }
-
-            return [
-                'status'  => 'error',
-                'message' => 'Invalid response from bKash API.',
-            ];
-        } catch (GuzzleException $exception) {
-            return [
-                'status'  => 'error',
-                'message' => $exception->getMessage(),
-            ];
+        $fields = $this->credential;
+        if ($this->verifyType === 'refmsg') {
+            $fields['reference'] = $this->invoice['invoiceid'];
+        } else {
+            $fields['trxid'] = $this->request->get('trxId');
         }
+
+        $context  = [
+            'http' => [
+                'method'  => 'POST',
+                'header'  => "Content-Type: application/json\r\n" .
+                    "Accept: application/json\r\n",
+                'content' => json_encode($fields),
+                'timeout' => 30,
+            ],
+        ];
+        $context  = stream_context_create($context);
+        $url      = $this->baseUrl . $this->verifyType;
+        $response = file_get_contents($url, false, $context);
+        $data     = json_decode($response, true);
+
+        if (is_array($data)) {
+            if ($this->verifyType === 'refmsg') {
+                return $data['transaction'][0];
+            } else {
+                return $data['transaction'];
+            }
+        }
+
+        return [
+            'status'  => 'error',
+            'message' => 'Invalid response from bKash API.',
+        ];
     }
 
     /**
@@ -404,12 +385,11 @@ if (!$_SERVER['REQUEST_METHOD'] === 'POST') {
     die("Direct access forbidden.");
 }
 
-$bKashLegacy = bKashLegacy::init();
+$bKashCheckout = bKashLegacy::init();
 
-if (!$bKashLegacy->isActive) {
+if (!$bKashCheckout->isActive) {
     die("The gateway is unavailable.");
 }
 
 header('Content-Type: application/json');
-
-echo json_encode($bKashLegacy->makeTransaction());
+die(json_encode($bKashCheckout->makeTransaction()));
