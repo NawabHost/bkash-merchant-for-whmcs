@@ -71,19 +71,9 @@ function bkashlegacy_config()
 
 function bkashlegacy_getTotalPayable($params)
 {
-    $rate           = 1;
-    $gwCurrency     = (int)$params['convertto'];
-    $clientCurrency = $params['clientdetails']['currency'];
-
-    if (!empty($gwCurrency) && ($gwCurrency !== $clientCurrency)) {
-        $rate = \WHMCS\Database\Capsule::table('tblcurrencies')
-                                       ->where('id', '=', $gwCurrency)
-                                       ->value('rate');
-    }
-
     $fee = empty($params['fee']) ? 0 : (($params['fee'] / 100) * $params['amount']);
 
-    return ceil(($params['amount'] + $fee) * $rate);
+    return ceil($params['amount'] + $fee);
 }
 
 function bkashlegacy_link($params)
