@@ -93,7 +93,7 @@ class bKashLegacy
     /**
      * bKashCheckout constructor.
      */
-    function __construct()
+    public function __construct()
     {
         $this->setGateway();
         $this->setRequest();
@@ -247,6 +247,8 @@ class bKashLegacy
             'transid'   => $trxId,
             'gateway'   => $this->gatewayModuleName,
             'date'      => Carbon::now()->toDateTimeString(),
+            'amount'    => $this->due,
+            'fees'      => $this->fee,
         ];
         $add    = localAPI('AddInvoicePayment', $fields);
 
