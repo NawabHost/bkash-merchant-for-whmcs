@@ -1,25 +1,28 @@
 {
-    "name": "aminulbd/bkash-merchant-for-whmcs",
-    "description": "bKash Merchant Payment Gateway for WHMCS",
-    "keywords": [
-        "whmcs",
-        "bkash",
-        "bkash merchant",
-        "gateway module"
-    ],
-    "homepage": "http://www.aminul.net/project/bkash-merchant-for-whmcs",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Aminul Islam",
-            "email": "me@aminul.net",
-            "homepage": "https://aminul.net/",
-            "role": "Developer"
-        }
-    ],
-    "support": {
-        "email": "me@aminul.net",
-        "forum": "https://aminul.net/",
-        "wiki": "https://aminul.net/"
+  "name": "aminulbd/bkash-merchant-for-whmcs",
+  "description": "bKash Merchant Payment Gateway for WHMCS",
+  "keywords": [
+    "whmcs",
+    "bkash",
+    "bkash merchant",
+    "gateway module"
+  ],
+  "homepage": "http://www.aminul.net/project/bkash-merchant-for-whmcs",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Aminul Islam",
+      "email": "me@aminul.net",
+      "homepage": "https://aminul.net/",
+      "role": "Developer"
     }
+  ],
+  "support": {
+    "email": "me@aminul.net",
+    "forum": "https://aminul.net/",
+    "wiki": "https://aminul.net/"
+  },
+  "require": {
+    "ext-json": "*"
+  }
 }
