@@ -2,6 +2,7 @@
 
 use Carbon\Carbon;
 use Symfony\Component\HttpFoundation\Request;
+use WHMCS\ClientArea;
 use WHMCS\Database\Capsule;
 
 require_once __DIR__ . '/../../../init.php';
@@ -385,6 +386,10 @@ class bKashLegacy
 
 if (!$_SERVER['REQUEST_METHOD'] === 'POST') {
     die("Direct access forbidden.");
+}
+
+if ((new ClientArea())->isLoggedIn()) {
+    die("You will need to login first.");
 }
 
 $bKashCheckout = bKashLegacy::init();
