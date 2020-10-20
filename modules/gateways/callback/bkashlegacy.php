@@ -1,10 +1,5 @@
 <?php
 
-use Carbon\Carbon;
-use Symfony\Component\HttpFoundation\Request;
-use WHMCS\ClientArea;
-use WHMCS\Database\Capsule;
-
 require_once __DIR__ . '/../../../init.php';
 require_once __DIR__ . '/../../../includes/gatewayfunctions.php';
 require_once __DIR__ . '/../../../includes/invoicefunctions.php';
@@ -139,7 +134,7 @@ class bKashLegacy
      */
     private function setRequest()
     {
-        $this->request = Request::createFromGlobals();
+        $this->request = \Symfony\Component\HttpFoundation\Request::createFromGlobals();
     }
 
     /**
@@ -163,12 +158,12 @@ class bKashLegacy
     private function setCurrency()
     {
         $this->gatewayCurrency  = (int)$this->gatewayParams['convertto'];
-        $this->customerCurrency = Capsule::table('tblclients')
+        $this->customerCurrency = \WHMCS\Database\Capsule::table('tblclients')
             ->where('id', '=', $this->invoice['userid'])
             ->value('currency');
 
         if (!empty($this->gatewayCurrency) && ($this->customerCurrency !== $this->gatewayCurrency)) {
-            $this->convoRate = Capsule::table('tblcurrencies')
+            $this->convoRate = \WHMCS\Database\Capsule::table('tblcurrencies')
                 ->where('id', '=', $this->gatewayCurrency)
                 ->value('rate');
         } else {
@@ -247,7 +242,7 @@ class bKashLegacy
             'invoiceid' => $this->invoice['invoiceid'],
             'transid'   => $trxId,
             'gateway'   => $this->gatewayModuleName,
-            'date'      => Carbon::now()->toDateTimeString(),
+            'date'      => \Carbon\Carbon::now()->toDateTimeString(),
             'amount'    => $this->due,
             'fees'      => $this->fee,
         ];
@@ -388,7 +383,7 @@ if (!$_SERVER['REQUEST_METHOD'] === 'POST') {
     die("Direct access forbidden.");
 }
 
-if ((new ClientArea())->isLoggedIn()) {
+if (!(new \WHMCS\ClientArea())->isLoggedIn()) {
     die("You will need to login first.");
 }
 
