@@ -379,19 +379,19 @@ class bKashLegacy
     }
 }
 
+header('Content-Type: application/json');
 if (!$_SERVER['REQUEST_METHOD'] === 'POST') {
-    die("Direct access forbidden.");
+    die(json_encode(['status' => 'error', 'message' => 'Direct access forbidden.']));
 }
 
 if (!(new \WHMCS\ClientArea())->isLoggedIn()) {
-    die("You will need to login first.");
+    die(json_encode(['status' => 'error', 'message' => 'You will need to login first.']));
 }
 
 $bKashCheckout = bKashLegacy::init();
 
 if (!$bKashCheckout->isActive) {
-    die("The gateway is unavailable.");
+    die(json_encode(['status' => 'error', 'message' => 'The gateway is unavailable.']));
 }
 
-header('Content-Type: application/json');
 die(json_encode($bKashCheckout->makeTransaction()));

@@ -83,10 +83,7 @@ function bkashlegacy_link($params)
     $scripts  = bkashlegacy_scriptsHandle($params);
 
     $fields = <<<HTML
-<div class="form-group">
-    <label class="sr-only" for="inlineFormInput">Transaction Key</label>
-    <input type="text" name="trxId" class="form-control mb-2" id="bkashlegacy-trxid" placeholder="ABC134CDEF" required>
-</div>
+    <input type="text" name="trxId" id="bkashlegacy-trxid" placeholder="ABC134CDEF" style="padding: 0px 6px; border: 1px solid #d9116b; border-radius: 4px;" required>
 HTML;
 
     if ($params['verifyType'] === 'refmsg') {
@@ -94,21 +91,23 @@ HTML;
     }
 
     return <<<HTML
-<ol class="text-left margin-top-5">
-    <li>Dial <span class="label label-primary">*247#</span> to open bKash menu.</li>
-    <li>Enter <span class="label label-primary">4</span> for <span class="label label-primary">Payment</span></li>
-    <li>Enter Number: <span class="label label-primary">{$params['msisdn']}</span></li></li>
-    <li>Enter Due Amount <span class="label label-primary">{$totalDue}</span> Taka</li>
-    <li>Enter Invoice #<span class="label label-primary">{$params['invoiceid']}</span> as Reference</li>
-    <li>Enter <span class="label label-primary">{$params['counter']}</span> as Counter Number</li>
-    <li>Enter PIN and Confirm</li>
-</ol>
-<form id="bkashlegacy-form" action="$action" method="POST" class="form-inline">
-    <input type="hidden" name="id" value="{$params['invoiceid']}">
-    {$fields}
-    <button type="submit" id="bkashlegacy-btn" class="btn btn-primary mb-2"><i class="fas fa-circle-notch fa-spin hidden" style="margin-right: 5px"></i>Verify</button>
-</form>
-<div id="bkashlegacy-response" class="alert alert-danger hidden" style="margin-top: 20px"></div>
+<div style="text-align: left;">
+    <ol>
+        <li>Dial <span style="background-color: #d9116b; padding: 2px 4px; border-radius: 4px; color: #fff;">*247#</span> to open bKash menu.</li>
+        <li>Enter <span style="background-color: #d9116b; padding: 2px 4px; border-radius: 4px; color: #fff;">4</span> for <span style="background-color: #d9116b; padding: 2px 4px; border-radius: 4px; color: #fff;">Payment</span></li>
+        <li>Enter Number: <span style="background-color: #d9116b; padding: 2px 4px; border-radius: 4px; color: #fff;">{$params['msisdn']}</span></li></li>
+        <li>Enter Due Amount <span style="background-color: #d9116b; padding: 2px 4px; border-radius: 4px; color: #fff;">{$totalDue}</span> Taka</li>
+        <li>Enter <span style="background-color: #d9116b; padding: 2px 4px; border-radius: 4px; color: #fff;">{$params['invoiceid']}</span> as Reference</li>
+        <li>Enter <span style="background-color: #d9116b; padding: 2px 4px; border-radius: 4px; color: #fff;">{$params['counter']}</span> as Counter Number</li>
+        <li>Enter PIN and Confirm</li>
+    </ol>
+    <form id="bkashlegacy-form" style="text-align: center;" action="$action" method="POST">
+        <input type="hidden" name="id" value="{$params['invoiceid']}">
+        {$fields}
+        <button type="submit" id="bkashlegacy-btn" style="border: 1px solid #d9116b;padding: 0px 10px;background: #d9116b;color: #fff;border-radius: 4px;">Verify</button>
+    </form>
+    <div id="bkashlegacy-response" style="display: none; text-align: center; font-size: 13px; padding: 5px 10px; margin-top: 10px; background: #f9ecec; border: 1px solid #ff1818; border-radius: 4px;"></div>
+</div>
 {$scripts}
 HTML;
 }
@@ -119,16 +118,14 @@ function bkashlegacy_scriptsHandle($params)
     $markup = <<<HTML
 <script>
     window.addEventListener('load', function() {
-        var bkashBtn = $('#bkashlegacy-btn');       
+        var bkashBtn = $('#bkashlegacy-btn');
         var bKashResponse = $('#bkashlegacy-response');
-        var bKashLoader = $('i', bkashBtn);
-    
+
         $('#bkashlegacy-form').on('submit', function(e) {
             e.preventDefault();
-            
+
             bkashBtn.attr('disabled', 'disabled');
-            bKashLoader.removeClass('hidden');
-    
+
             $.ajax({
                 method: "POST",
                 url: "{$apiUrl}",
@@ -137,15 +134,15 @@ function bkashlegacy_scriptsHandle($params)
                 if (response.status === 'success') {
                     window.location = "{$params['returnurl']}" + "&paymentsuccess=true";
                 } else {
-                   bKashResponse.removeClass('hidden');
-                   bKashResponse.text(response.message);   
+                   bKashResponse.show();
+                   bKashResponse.text(response.message);
                 }
+
             }).fail(function() {
-                bKashResponse.removeClass('hidden');
+                bKashResponse.show();
                 bKashResponse.text('Something is wrong! Please contact support.');
               }).always(function () {
                 bkashBtn.removeAttr('disabled');
-                bKashLoader.addClass('hidden');
             });
         })
     });
